@@ -1,7 +1,29 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
+import SectionContainer from "../components/SectionContainer.astro";
+import Hero from "../components/Hero.astro";
+import Projects from "../components/Projects.astro"
+import CodeIcon from "../components/icons/Code.astro"
 ---
 
-<Layout title="Welcome to Astro.">
-	La pagina principal
+<Layout
+  title="Blogfolio de minkaspr - Desarrollador y Programador Junior"
+  description="Brindame la oportunidad de poner en practica mis conocimientos."
+>
+  <main class="px-4">
+    <SectionContainer class="py-16 md:py-36">
+      <Hero />
+    </SectionContainer>
+  </main>
+  <div class="space-y-24">
+	<SectionContainer id="proyectos">
+		<h2
+		  class="flex items-center mb-6 text-3xl font-semibold gap-x-3 text-black/80 dark:text-white"
+		>
+		  <CodeIcon class="size-7" />
+		  Proyectos
+		</h2>
+		<Projects />
+	  </SectionContainer>
+  </div>
 </Layout>
