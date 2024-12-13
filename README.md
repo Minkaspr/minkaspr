@@ -2,7 +2,7 @@
 #  <img src="https://cdn.sanity.io/images/do2rqv0h/production/3356021b2d743e60cb89b0b97196fb2b2b0b44a0-800x800.gif" style="border-radius: 16px; width: 96px; height: 96px;"/> Hola, soy Minkaspr
 
 <p style="font-family: Arial, sans-serif; font-size: 16px; text-align: center; margin-top: 24px;">
-    ¡Bienvenid@! Soy un entusiasta del desarrollo de software, apasionado por crear soluciones innovadoras 
+    Soy un entusiasta del desarrollo de software, apasionado por crear soluciones innovadoras 
     para problemas prácticos. Aquí encontrarás proyectos en diversos lenguajes y tecnologías, 
     desde aplicaciones web hasta móviles. Explora los repositorios y descubre lo que he estado construyendo.
 </p>
