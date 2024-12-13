@@ -8,13 +8,13 @@
 </p>
 
 <div style="display: flex; justify-content: center; gap: 12px; margin-top: 24px; margin-bottom: 24px;">
-    <a href="https://portfolio-plum-iota-60.vercel.app/" style="text-decoration: none;">
+    <a href="https://portfolio-plum-iota-60.vercel.app/" style="text-decoration: none;" target="_blank">
         <img 
             src="public/Portafolio.png" 
             alt="Badged Portfolio" 
             style="height: 32px; border-radius: 8px;">
     </a>
-    <a href="https://www.linkedin.com/in/dario-quispe-mk/" style="text-decoration: none;">
+    <a href="https://www.linkedin.com/in/dario-quispe-mk/" style="text-decoration: none;" target="_blank">
         <img 
             src="public/LinkedIn.png" 
             alt="Badged LinkedIn" 
