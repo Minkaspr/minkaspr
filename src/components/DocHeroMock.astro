@@ -1,0 +1,127 @@
+---
+// Ilustración del hero de DynamicDoc: un formulario que se llena y el PDF
+// que se actualiza al lado. Hecha con HTML/CSS, sin imágenes.
+interface Props {
+	lang: 'es' | 'en';
+}
+
+const { lang } = Astro.props;
+
+const t = {
+	es: { form: 'Datos del participante', name: 'Nombre', uni: 'Universidad', next: 'Siguiente', docTitle: 'PARTICIPACIÓN EN EL EVENTO', docSection: 'DATOS DEL PARTICIPANTE', value: 'Martin Samanta', live: 'Vista previa en vivo' },
+	en: { form: 'Participant details', name: 'Name', uni: 'University', next: 'Next', docTitle: 'EVENT PARTICIPATION', docSection: 'PARTICIPANT DETAILS', value: 'Martin Samanta', live: 'Live preview' },
+}[lang];
+---
+
+<div class="doc-mock relative rounded-xl bg-surface-container-low p-5 sm:p-6" aria-hidden="true">
+	<div class="grid grid-cols-5 gap-4 items-start">
+		<!-- Formulario -->
+		<div class="col-span-2 rounded-lg bg-surface-container-highest p-4 shadow-(--shadow-card)">
+			<span class="block font-headline text-[11px] font-bold text-on-surface mb-4">{t.form}</span>
+
+			<span class="block text-[9px] font-headline uppercase tracking-widest text-on-surface-muted mb-1.5">{t.name}</span>
+			<div class="field-active rounded-sm bg-surface-container px-2 py-1.5 mb-3 text-[10px] text-on-surface whitespace-nowrap overflow-hidden">
+				<span class="typed inline-block overflow-hidden align-bottom">{t.value}</span><span class="caret">|</span>
+			</div>
+
+			<span class="block text-[9px] font-headline uppercase tracking-widest text-on-surface-muted mb-1.5">{t.uni}</span>
+			<div class="rounded-sm bg-surface-container h-6 mb-4"></div>
+
+			<div class="flex justify-end">
+				<span class="rounded-sm bg-primary-container text-on-primary-container px-2.5 py-1 text-[9px] font-headline font-bold">{t.next}</span>
+			</div>
+		</div>
+
+		<!-- Documento PDF -->
+		<div class="paper col-span-3 rounded-lg p-4 sm:p-5 shadow-(--shadow-elevated)">
+			<div class="flex items-center justify-between mb-3">
+				<span class="text-[8px] sm:text-[9px] font-bold tracking-wide">{t.docTitle}</span>
+				<span class="pdf-badge text-[8px] font-bold px-1.5 py-0.5 rounded-sm">PDF</span>
+			</div>
+			<div class="space-y-1.5 mb-4">
+				<div class="line w-full"></div>
+				<div class="line w-11/12"></div>
+				<div class="line w-4/6"></div>
+			</div>
+			<span class="block text-[8px] sm:text-[9px] font-bold tracking-wide mb-2">{t.docSection}</span>
+			<div class="space-y-1.5">
+				<div class="flex items-center gap-1.5">
+					<div class="line w-1/4"></div>
+					<span class="doc-value text-[9px] font-bold whitespace-nowrap">{t.value}</span>
+					<div class="line flex-1"></div>
+				</div>
+				<div class="line w-full"></div>
+				<div class="line w-10/12"></div>
+				<div class="line w-3/5"></div>
+			</div>
+		</div>
+	</div>
+
+	<span class="absolute -bottom-3 right-6 inline-flex items-center gap-1.5 rounded-full bg-surface-container-highest px-3 py-1 font-headline text-[9px] uppercase tracking-widest text-primary-container shadow-(--shadow-card)">
+		<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+		{t.live}
+	</span>
+</div>
+
+<style>
+	/* El papel se ve como un PDF en ambos temas */
+	.paper {
+		background-color: #fbfbfc;
+		color: #1a2029;
+	}
+	.line {
+		height: 4px;
+		border-radius: 2px;
+		background-color: #d9dee3;
+	}
+	.pdf-badge {
+		background-color: #fde2e1;
+		color: #b42318;
+	}
+
+	/* El nombre se escribe en el formulario y aparece en el documento */
+	.typed {
+		width: 0;
+		animation: type 6s steps(14) infinite;
+	}
+	.caret {
+		color: var(--color-primary-container);
+		animation: blink 1s step-end infinite;
+	}
+	.field-active {
+		box-shadow: 0 0 0 1px var(--color-primary-container);
+	}
+	.doc-value {
+		opacity: 0;
+		color: #0a6487;
+		animation: appear 6s ease-in-out infinite;
+	}
+
+	@keyframes type {
+		0%, 8% { width: 0; }
+		40%, 85% { width: 14ch; }
+		95%, 100% { width: 0; }
+	}
+	@keyframes appear {
+		0%, 35% { opacity: 0; }
+		45%, 85% { opacity: 1; }
+		95%, 100% { opacity: 0; }
+	}
+	@keyframes blink {
+		50% { opacity: 0; }
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.typed,
+		.doc-value,
+		.caret {
+			animation: none;
+		}
+		.typed {
+			width: auto;
+		}
+		.doc-value {
+			opacity: 1;
+		}
+	}
+</style>

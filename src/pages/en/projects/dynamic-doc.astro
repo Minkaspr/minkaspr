@@ -1,0 +1,296 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import DocHeroMock from '../../../components/DocHeroMock.astro';
+
+const IMAGE_URL = "https://i.pinimg.com/736x/a6/dd/64/a6dd64ab89d43926b7b4094111bcdd85.jpg";
+const SITE_URL = "https://dynamic-doc.vercel.app/";
+const YOUTUBE_ID = "DHroXxALmqA";
+---
+
+<Layout>
+
+  <!-- ① HERO: texto a la izquierda, ilustración de la app a la derecha -->
+  <header class="max-w-7xl mx-auto px-8 md:px-16 pt-10 pb-16">
+    <nav class="hero-fade-in flex items-center gap-2 mb-12" aria-label="Breadcrumb">
+      <a href="/en/projects/"
+        class="font-headline text-[10px] uppercase tracking-widest hover:opacity-80 transition-opacity"
+        style="color: var(--color-primary-container)">Projects</a>
+      <span class="material-symbols-outlined text-sm" style="color: var(--color-on-surface-muted)">chevron_right</span>
+      <span class="font-headline text-[10px] uppercase tracking-widest"
+        style="color: var(--color-on-surface)">DynamicDoc</span>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+      <div class="lg:col-span-6">
+        <div class="hero-fade-in inline-flex items-center gap-3 mb-4">
+          <div class="h-px w-12" style="background-color: var(--color-primary-container)"></div>
+          <span class="font-headline text-[10px] uppercase tracking-widest font-bold"
+            style="color: var(--color-primary-container)">Document Generation</span>
+        </div>
+        <h1 class="hero-fade-in text-5xl md:text-7xl font-headline font-bold tracking-tighter leading-none mb-6"
+          style="color: var(--color-on-surface)">
+          DYNAMIC<span style="color: var(--color-primary-container)">DOC</span>
+        </h1>
+        <p class="hero-fade-in text-lg font-body leading-relaxed max-w-xl mb-8" style="color: var(--color-on-surface-variant)">
+          Angular application that lets users fill out structured forms to dynamically generate PDF documents, with a real-time preview.
+        </p>
+        <div class="hero-fade-in flex flex-wrap items-center gap-3">
+          <a
+            href={SITE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-3 px-6 py-3 rounded-lg font-headline font-bold text-[10px] uppercase tracking-widest transition-shadow hover:shadow-[0_8px_24px_rgba(0,92,120,0.35)]"
+            style="background-color: var(--color-primary-container); color: var(--color-on-primary-container);"
+          >
+            <span class="material-symbols-outlined text-base">open_in_new</span>
+            VISIT WEBSITE
+          </a>
+          <a
+            href="#demo"
+            class="inline-flex items-center gap-3 px-6 py-3 rounded-lg font-headline font-bold text-[10px] uppercase tracking-widest transition-colors hover:bg-surface-container"
+            style="color: var(--color-on-surface); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-outline-variant) 60%, transparent);"
+          >
+            <span class="material-symbols-outlined text-base">play_circle</span>
+            WATCH DEMO
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-fade-in lg:col-span-6">
+        <DocHeroMock lang="en" />
+      </div>
+    </div>
+  </header>
+
+  <!-- ② VIDEO -->
+  <section id="demo" class="max-w-7xl mx-auto px-8 md:px-16 py-12 scroll-mt-20">
+    <youtube-embed class="block relative group aspect-video w-full overflow-hidden rounded-xl shadow-2xl cursor-pointer select-none"
+      style="background-color: var(--color-surface-container-low)" data-video-id={YOUTUBE_ID}>
+
+      <div class="cover-ui absolute inset-0 w-full h-full z-10 transition-opacity duration-300">
+        <img
+          class="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700 ease-out"
+          src={IMAGE_URL}
+          alt="DynamicDoc demo preview"
+        />
+
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="relative">
+            <div class="absolute inset-0 animate-ping rounded-2xl scale-150"
+              style="background-color: color-mix(in srgb, var(--color-primary) 20%, transparent)"></div>
+            <button
+              class="relative w-24 h-24 rounded-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-transform duration-200 pointer-events-none"
+              style="background-color: var(--color-primary-container); color: var(--color-on-primary-container);"
+              aria-label="Play demo"
+              type="button"
+            >
+              <span class="material-symbols-outlined text-4xl"
+                style="font-variation-settings: 'FILL' 1, 'wght' 500;">play_arrow</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="absolute bottom-0 left-0 w-full p-8 bg-gradient-to-t from-surface to-transparent pointer-events-none">
+          <div class="flex justify-between items-end flex-wrap gap-4">
+            <div class="font-headline">
+              <p class="text-xs font-bold uppercase tracking-widest mb-1"
+                style="color: var(--color-primary-container)">Demo</p>
+              <h3 class="text-xl font-bold" style="color: var(--color-on-surface)">REAL-TIME PDF GENERATION</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </youtube-embed>
+  </section>
+
+  <!-- ③ DOCUMENTATION -->
+  <div class="max-w-7xl mx-auto px-8 md:px-16 pb-24 grid grid-cols-1 lg:grid-cols-12 gap-16">
+
+    <aside class="lg:col-span-3 space-y-12 order-2 lg:order-1 lg:sticky lg:top-24 lg:self-start">
+
+      <div>
+        <h4 class="font-headline text-[10px] uppercase tracking-[0.2em] mb-6"
+          style="color: var(--color-primary-container)">Technologies</h4>
+        <div class="flex flex-wrap gap-2">
+          {['Angular 19.0.7', 'Tailwind CSS 4', 'pdfMake', 'Reactive Forms'].map(tag => (
+            <span class="px-3 py-1 text-xs font-headline rounded"
+              style="background: var(--color-surface-container); color: var(--color-primary)">{tag}</span>
+          ))}
+        </div>
+      </div>
+
+      <div class="pt-8 border-t" style="border-color: color-mix(in srgb, var(--color-outline-variant) 15%, transparent)">
+        <h4 class="font-headline text-[10px] uppercase tracking-[0.2em] mb-6"
+          style="color: var(--color-primary-container)">Project Metadata</h4>
+        <ul class="space-y-4 font-body text-sm">
+          {[
+            { label: 'Status', value: 'LIVE' },
+            { label: 'Site', value: 'dynamic-doc.vercel.app' },
+          ].map(({ label, value }) => (
+            <li class="flex justify-between gap-4">
+              <span style="color: var(--color-on-surface-variant)">{label}</span>
+              <span class="font-mono text-xs" style="color: var(--color-on-surface)">{value}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+    </aside>
+
+    <article class="lg:col-span-9 order-1 lg:order-2 project-doc">
+
+      <section>
+        <h2>Description</h2>
+        <p>
+          DynamicDoc is an application built with <code>Angular 19.0.7</code> that lets users fill out structured forms to dynamically generate PDF documents. It uses <code>pdfMake</code> to create PDFs with custom fonts like Poppins and Roboto, providing a real-time document generation experience.
+        </p>
+      </section>
+
+      <section>
+        <h2>Key Features</h2>
+        <ul>
+          <li><strong>Dynamic PDF generation.</strong> Users fill out a form and see the document update in real time.</li>
+          <li><strong>Customizable templates.</strong> Document layouts can be adapted to specific needs.</li>
+          <li><strong>Form validation.</strong> Ensures data is entered correctly.</li>
+          <li><strong>Live preview.</strong> See the PDF before downloading or printing it.</li>
+          <li><strong>Instant download and printing.</strong> The generated document can be downloaded or printed directly from the app.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Installation & Setup</h2>
+        <p>
+          To run it you need <code>Node.js 16+</code>, an Angular CLI version compatible with Angular 19 and a modern browser.
+        </p>
+        <div class="my-10 p-6 rounded-r-lg border-l-2 overflow-x-auto"
+          style="background: var(--color-surface-container-lowest); border-color: color-mix(in srgb, var(--color-primary-container) 30%, transparent)">
+          <pre class="text-sm font-mono" style="color: var(--color-primary)">npm install
+ng serve</pre>
+        </div>
+        <p>
+          Then open <code>http://localhost:4200/</code> in your browser.
+        </p>
+      </section>
+
+      <section>
+        <h2>How to Use It</h2>
+        <ol>
+          <li><strong>Fill out the form.</strong> Complete the required fields.</li>
+          <li><strong>Preview the document.</strong> The live preview updates as you fill in the fields.</li>
+          <li><strong>Download or print.</strong> Once finished, download or print the PDF directly.</li>
+        </ol>
+      </section>
+
+    </article>
+  </div>
+
+</Layout>
+
+<script>
+  class YouTubeEmbed extends HTMLElement {
+    constructor() {
+      super();
+      let isLoaded = false;
+      const videoId = this.dataset.videoId;
+      const coverUi = this.querySelector<HTMLElement>('.cover-ui');
+
+      this.addEventListener('click', () => {
+        if (!isLoaded) {
+          isLoaded = true;
+
+          const iframe = document.createElement('iframe');
+          if (videoId) {
+            iframe.setAttribute('src', `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`);
+          }
+          iframe.setAttribute('frameborder', '0');
+          iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+          iframe.setAttribute('allowfullscreen', 'true');
+          iframe.className = 'absolute inset-0 w-full h-full z-0 rounded-xl';
+
+          iframe.onload = () => {
+            if (coverUi) {
+              coverUi.style.opacity = '0';
+              setTimeout(() => {
+                if (coverUi) coverUi.style.display = 'none';
+                iframe.className = 'absolute inset-0 w-full h-full z-20 rounded-xl';
+              }, 300);
+            }
+          };
+
+          this.appendChild(iframe);
+        }
+      });
+    }
+  }
+  if (!customElements.get('youtube-embed')) {
+    customElements.define('youtube-embed', YouTubeEmbed);
+  }
+</script>
+
+<script>
+  import { animate, inView, stagger } from "motion";
+
+  document.addEventListener("astro:page-load", () => {
+    // Este listener queda activo en toda la navegación: solo actúa en esta página
+    if (!document.querySelector(".project-doc")) return;
+
+    // Hero: overlay, breadcrumb and title — enter in sequence over the image
+    const heroText = document.querySelectorAll<HTMLElement>(".hero-fade-in");
+    if (heroText.length > 0) {
+      heroText.forEach((el) => (el.style.opacity = "0"));
+      animate(heroText as any, { opacity: [0, 1], y: [16, 0] }, { duration: 0.6, delay: stagger(0.12), ease: [0.22, 1, 0.36, 1] });
+    }
+
+    // Video and documentation
+    const blocks = document.querySelectorAll<HTMLElement>("section.max-w-7xl, aside, .project-doc > *");
+    blocks.forEach((el) => {
+      el.style.opacity = "0";
+      inView(el, () => {
+        animate(el as any, { opacity: [0, 1], y: [30, 0] }, { duration: 0.8, ease: [0.22, 1, 0.36, 1] });
+      }, { margin: "-10%" });
+    });
+  });
+</script>
+
+<style>
+  .project-doc h2 {
+    font-family: var(--font-headline);
+    font-size: 1.875rem;
+    font-weight: 700;
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    letter-spacing: -0.025em;
+    color: var(--color-primary);
+  }
+  .project-doc h3 {
+    font-family: var(--font-headline);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    color: var(--color-primary);
+  }
+  .project-doc p {
+    margin-bottom: 1.25rem;
+    line-height: 1.8;
+    color: var(--color-on-surface);
+  }
+  .project-doc strong { color: var(--color-on-surface); font-weight: 600; }
+  .project-doc ul, .project-doc ol {
+    margin: 0 0 1.5rem 0;
+    padding-left: 1.5rem;
+    color: var(--color-on-surface);
+    line-height: 1.8;
+  }
+  .project-doc ul { list-style: disc; }
+  .project-doc ol { list-style: decimal; }
+  .project-doc li { margin-bottom: 0.5rem; }
+  .project-doc code {
+    background-color: var(--color-surface-container-lowest);
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.25rem;
+    font-family: monospace;
+    font-size: 0.88em;
+    color: var(--color-primary-container);
+  }
+</style>
