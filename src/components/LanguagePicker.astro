@@ -1,0 +1,53 @@
+---
+import { languages } from '../i18n/ui';
+import { getLangFromUrl } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+
+const paths = {
+  es: '/',
+  en: '/en/',
+};
+
+// Simple logic to switch language by changing the route prefix
+function getLangPath(l: string) {
+    const currentPath = Astro.url.pathname;
+    if (l === 'es') {
+        if (currentPath.startsWith('/en/')) {
+            return currentPath.replace('/en/', '/');
+        }
+        if (currentPath === '/en') return '/';
+        return currentPath;
+    } else {
+        if (currentPath.startsWith('/en/')) return currentPath;
+        if (currentPath === '/') return '/en/';
+        return `/en${currentPath}`;
+    }
+}
+---
+
+<ul class="flex gap-1">
+  {Object.entries(languages).map(([code, label]) => (
+    <li>
+      <a
+        href={getLangPath(code)}
+        style={`
+          display: inline-block;
+          padding: 0.15rem 0.5rem;
+          border-radius: 0.25rem;
+          font-family: var(--font-headline);
+          font-size: 10px;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          text-decoration: none;
+          font-weight: ${lang === code ? '700' : '500'};
+          color: ${lang === code ? 'var(--color-primary-container)' : 'var(--color-nav-item)'};
+          transition: color 0.2s;
+        `}
+      >
+        {code}
+      </a>
+    </li>
+  ))}
+</ul>
+

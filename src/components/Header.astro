@@ -1,0 +1,95 @@
+---
+import { getLangFromUrl, useTranslations, useTranslatedPath } from '../i18n/utils';
+import ThemeToggle from './ThemeToggle.astro';
+import LanguagePicker from './LanguagePicker.astro';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+const currentPath = Astro.url.pathname;
+
+const navItems = [
+  { name: t('nav.home'), path: '/' },
+  { name: t('nav.projects'), path: '/projects/' },
+  { name: t('nav.about'), path: '/about/' },
+];
+---
+
+<!--
+  HEADER — siempre visible.
+  Mobile (< md): brand + hamburguesa + controles.
+  Tablet/Desktop (md+): brand + nav links + controles.
+-->
+<header
+  id="site-header"
+  transition:name="site-header"
+  transition:animate="none"
+  class="fixed top-0 left-0 right-0 z-40 h-14"
+  style="
+    background-color: color-mix(in srgb, var(--color-surface) 85%, transparent);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-outline-variant) 25%, transparent);
+  "
+>
+  <div class="flex items-center justify-between h-full px-5 max-w-7xl mx-auto">
+
+    <!-- Left: brand -->
+    <div class="flex items-center gap-3">
+      <!-- Hamburguesa eliminada: el tab lateral del sidebar la reemplaza en mobile -->
+      <span
+        class="text-lg font-black tracking-tighter font-headline"
+        style="color: var(--color-primary-container)"
+      >
+        MINKASPR
+      </span>
+    </div>
+
+    <!-- Center: nav links en tablet/desktop (md+) -->
+    <nav class="hidden md:flex items-center gap-7" aria-label="Main navigation">
+      {navItems.map((item) => {
+        const isActive = currentPath === translatePath(item.path)
+          || (item.path !== '/' && currentPath.startsWith(translatePath(item.path)));
+        return (
+          <a
+            href={translatePath(item.path)}
+            class="header-nav-link"
+            aria-current={isActive ? 'page' : undefined}
+            data-active={isActive}
+          >
+            {item.name}
+          </a>
+        );
+      })}
+    </nav>
+
+    <!-- Right: controles siempre visibles -->
+    <div class="flex items-center gap-3">
+      <LanguagePicker />
+      <div class="w-px h-4" style="background-color: color-mix(in srgb, var(--color-outline-variant) 40%, transparent)"></div>
+      <ThemeToggle />
+    </div>
+
+  </div>
+</header>
+
+<style>
+  .header-nav-link {
+    font-family: var(--font-headline);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--color-on-surface-variant);
+    transition: color 0.2s ease;
+  }
+  .header-nav-link:hover {
+    color: var(--color-primary-container);
+  }
+  .header-nav-link[data-active="true"] {
+    color: var(--color-primary-container);
+    font-weight: 700;
+  }
+</style>
+

@@ -1,0 +1,213 @@
+@import "tailwindcss";
+
+/* ============================================
+   CUSTOM DARK VARIANT (class-based)
+   ============================================ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================
+   DESIGN TOKENS — DARK (primary defaults)
+   All tokens resolve via CSS custom properties,
+   so light-mode overrides work automatically.
+   ============================================ */
+@theme {
+  /* Brand / Accent — luminous tech-blue */
+  --color-primary: #8ccff0;
+  --color-primary-container: #4fc3f7;
+  --color-on-primary: #003547;
+  --color-on-primary-container: #04212e;
+
+  /* Secondary — deep obsidian-blue (the "glow in the dark" depth tone) */
+  --color-secondary: #005c78;
+  --color-secondary-container: #003547;
+  --color-on-secondary: #c0e8ff;
+
+  /* Tertiary */
+  --color-tertiary: #c3c7cb;
+
+  /* Surface scale */
+  --color-surface: #0f1417;
+  --color-surface-bright: #353a3d;
+  --color-surface-dim: #0f1417;
+  --color-surface-container: #1b2023;
+  --color-surface-container-low: #171c1f;
+  --color-surface-container-lowest: #0a0f12;
+  --color-surface-container-high: #262b2e;
+  --color-surface-container-highest: #303539;
+
+  /* Text / content */
+  --color-on-surface: #dfe3e7;
+  --color-on-surface-variant: #b0bec5;
+  --color-on-surface-muted: #8b97a6;
+
+  /* Borders */
+  --color-outline: #5b6b78;
+  --color-outline-variant: #374151;
+
+  /* Semantic / adaptive aliases */
+  --color-text-heading: #ffffff;
+  /* big titles */
+  --color-text-body: #dfe3e7;
+  /* body copy  */
+  --color-text-muted: #8b97a6;
+  /* secondary  */
+  --color-text-inverse: #0f1417;
+  /* text on orange */
+  --color-nav-item: #8b97a6;
+  /* inactive nav */
+  --color-nav-item-hover: #dfe3e7;
+  /* hover nav   */
+  --color-border-subtle: rgba(255, 255, 255, 0.05);
+
+  /* Typography */
+  --font-headline: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-label: "Space Grotesk", sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+
+  /* Animations */
+  --animate-spin-slow: spin 8s linear infinite;
+
+  /* Estados interactivos */
+  --color-primary-hover: #6bb8e8;       /* hover sobre botones primarios */
+  --color-surface-interactive: #262b2e; /* hover sobre items de lista/nav */
+
+  /* Feedback / Estado */
+  --color-success: #4caf82;
+  --color-warning: #f5a623;
+  --color-error: #e05c5c;
+  --color-info: #8ccff0;
+
+  /* Inputs y formularios */
+  --color-input-bg: #1b2023;
+  --color-input-border: #374151;
+  --color-input-border-focus: #4fc3f7;
+  --color-input-text: #dfe3e7;
+  --color-input-placeholder: #96a2b0;
+
+  /* Sombras */
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.4);
+  --shadow-elevated: 0 8px 40px rgba(0,0,0,0.6);
+
+  /* Divisores */
+  --color-divider: rgba(255,255,255,0.08);
+}
+
+/* ============================================
+   LIGHT MODE TOKEN OVERRIDES
+   Only what changes — the rest inherits dark.
+   ============================================ */
+@layer base {
+  html:not(.dark) {
+    color-scheme: light;
+
+    /* Surfaces — rampa tonal real (de hundido a brillante),
+       base ligeramente gris-azulada para que no lea como blanco plano */
+    --color-surface-container-lowest: #d7dee5;
+    --color-surface-dim: #dde4ea;
+    --color-surface: #e7ecf1;
+    --color-surface-container-low: #eef2f6;
+    --color-surface-container: #f6f8fa;
+    --color-surface-container-high: #fbfcfd;
+    --color-surface-container-highest: #ffffff;
+    --color-surface-bright: #ffffff;
+
+    /* Text */
+    --color-on-surface: #1a2029;
+    --color-on-surface-variant: #3d4a55;
+    --color-on-surface-muted: #566170;
+
+    /* Borders */
+    --color-outline: #9fb0bd;
+    --color-outline-variant: #c7d2db;
+
+    /* Semantic aliases */
+    --color-text-heading: #111827;
+    --color-text-body: #1a2029;
+    --color-text-muted: #566170;
+    --color-text-inverse: #ffffff;
+    --color-nav-item: #566170;
+    --color-nav-item-hover: #111827;
+    --color-border-subtle: rgba(0, 0, 0, 0.06);
+
+    /* Brand — en claro el azul oscuro es el protagonista (texto y botones
+       leen perfecto sobre fondo claro); el celeste pasa a acento ligero */
+    --color-primary: #0a6487;
+    --color-primary-container: #005c78;
+    --color-on-primary-container: #ffffff;
+    --color-secondary: #4fc3f7;
+    --color-secondary-container: #dff1fa;
+    --color-on-secondary: #003547;
+    --color-primary-hover: #0c6788;
+    --color-surface-interactive: #dde3e9;
+
+    --color-input-bg: #ffffff;
+    --color-input-border: #d1dae3;
+    --color-input-border-focus: #0f7ea8;
+    --color-input-text: #1a2029;
+    --color-input-placeholder: #6b7280;
+
+    --shadow-card: 0 4px 24px rgba(0,0,0,0.08);
+    --shadow-elevated: 0 8px 40px rgba(0,0,0,0.15);
+
+    --color-divider: rgba(0,0,0,0.07);
+
+    --color-error: #b42318;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  /* ---- Base resets ---- */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
+    font-family: var(--font-body);
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+}
+
+/* ============================================
+   GLOBAL UTILITIES
+   ============================================ */
+.editorial-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ============================================
+   VIEW TRANSITIONS — Smooth morph
+   ============================================ */
+
+/* Página entera: fade suave y sincronizado */
+::view-transition-old(root) {
+  animation: 220ms ease-out both vt-fade-out;
+}
+::view-transition-new(root) {
+  animation: 320ms 80ms ease-in both vt-fade-in;
+}
+
+@keyframes vt-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@keyframes vt-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+

@@ -1,0 +1,265 @@
+---
+import { getLangFromUrl, useTranslations, useTranslatedPath } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+const currentPath = Astro.url.pathname;
+
+const navItems = [
+  { name: t('nav.home'), path: '/', icon: 'home' },
+  { name: t('nav.projects'), path: '/projects/', icon: 'rebase_edit' },
+  { name: t('nav.about'), path: '/about/', icon: 'person' },
+];
+
+// Texto localizado para el CTA
+const hireMeLabel = lang === 'es' ? 'Contratar' : 'Hire Me';
+---
+
+<!-- =====================================================
+     OVERLAY — capa oscura detrás del sidebar en mobile
+     ===================================================== -->
+<div
+  id="sidebar-overlay"
+  transition:name="sidebar-overlay"
+  transition:animate="none"
+  class="hidden fixed inset-0 z-40 md:hidden"
+  style="background-color: rgba(0,0,0,0.4); backdrop-filter: blur(2px);"
+  aria-hidden="true"
+></div>
+
+<!-- =====================================================
+     DRAWER SIDEBAR — mobile only (< md)
+     z-50: superpone al header (z-40)
+     ===================================================== -->
+<aside
+  id="app-sidebar"
+  transition:name="app-sidebar"
+  transition:animate="none"
+  class="
+    fixed left-0 top-0 h-screen w-72 z-50
+    md:hidden
+    -translate-x-full
+    transition-transform duration-300 ease-in-out
+  "
+  style="
+    background-color: var(--color-surface-container);
+    border-right: 1px solid color-mix(in srgb, var(--color-outline-variant) 20%, transparent);
+  "
+  aria-label="Mobile navigation drawer"
+>
+  <!-- Cabecera del sidebar -->
+  <div class="px-6 pt-8 pb-6">
+    <div class="text-lg font-black font-headline" style="color: var(--color-on-surface)">
+      MINKASPR
+    </div>
+    <div class="font-headline uppercase tracking-widest text-[10px] mt-0.5" style="color: var(--color-primary-container)">
+      Dario Quispe
+    </div>
+  </div>
+
+  <div class="h-px mx-6 mb-4" style="background-color: color-mix(in srgb, var(--color-outline-variant) 25%, transparent)"></div>
+
+  <!-- Items de navegación -->
+  <nav role="navigation" aria-label="Mobile navigation">
+    <ul class="list-none m-0 p-0">
+      {navItems.map((item) => {
+        const isActive = currentPath === translatePath(item.path)
+          || (item.path !== '/' && currentPath.startsWith(translatePath(item.path)));
+        return (
+          <li>
+            <a
+              href={translatePath(item.path)}
+              aria-current={isActive ? 'page' : undefined}
+              class="sidebar-nav-item"
+              data-active={String(isActive)}
+            >
+              <span
+                class="material-symbols-outlined"
+                style={`font-size: 20px; font-variation-settings: ${isActive ? "'FILL' 1, 'wght' 500" : "'FILL' 0, 'wght' 400"};`}
+              >
+                {item.icon}
+              </span>
+              <span>{item.name}</span>
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  </nav>
+
+  <!-- CTA -->
+  <div class="absolute bottom-8 left-0 right-0 px-6">
+    <button
+      class="w-full py-3 font-headline uppercase tracking-widest text-[10px] font-bold rounded-lg"
+      style="background-color: var(--color-primary-container); color: var(--color-on-primary-container);"
+    >
+      {hireMeLabel}
+    </button>
+  </div>
+</aside>
+
+<!-- =====================================================
+     TAB TOGGLE — pestaña lateral fija, solo mobile
+     Flota en el borde derecho del sidebar.
+     Cerrado: en x=0 (asoma desde el borde izquierdo)
+     Abierto: en x=18rem (borde derecho del drawer)
+     ===================================================== -->
+<button
+  id="sidebar-tab"
+  transition:name="sidebar-tab"
+  transition:animate="none"
+  class="md:hidden fixed z-50"
+  aria-label="Toggle navigation"
+  aria-expanded="false"
+  aria-controls="app-sidebar"
+  type="button"
+>
+  <!-- Semicírculo + icono -->
+  <span id="tab-icon" class="material-symbols-outlined">chevron_right</span>
+</button>
+
+<style>
+  /* ---- Nav items ---- */
+  .sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.875rem 1.5rem;
+    font-family: var(--font-headline);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 10px;
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: all 0.15s ease;
+    color: var(--color-on-surface-variant);
+  }
+  .sidebar-nav-item:hover {
+    color: var(--color-on-surface);
+    background-color: color-mix(in srgb, var(--color-primary-container) 8%, transparent);
+  }
+  .sidebar-nav-item[data-active="true"] {
+    color: var(--color-on-surface);
+    font-weight: 700;
+    border-left-color: var(--color-primary-container);
+    background-color: color-mix(in srgb, var(--color-primary-container) 12%, transparent);
+  }
+  .sidebar-nav-item[data-active="true"] .material-symbols-outlined {
+    color: var(--color-primary-container);
+  }
+
+  /* ---- Tab toggle — semicírculo en la parte inferior izquierda ---- */
+  #sidebar-tab {
+    /* Posición: inferior izquierda, a la altura del botón CTA */
+    bottom: 2.5rem;
+    left: 0;
+
+    /* Forma: media pastilla que apunta hacia la derecha */
+    width: 40px;
+    height: 64px;
+    border-radius: 0 9999px 9999px 0;
+    border: none;
+    cursor: pointer;
+    outline: none;
+
+    /* Visual: semitransparente por defecto — mismo fondo que el sidebar */
+    background-color: var(--color-surface-container);
+    color: var(--color-on-surface-variant);
+    opacity: 0.75;
+
+    /* Borde sutil que da el contorno */
+    box-shadow:
+      inset -1px 0 0 color-mix(in srgb, var(--color-outline-variant) 40%, transparent),
+      2px 0 16px rgba(0, 0, 0, 0.3);
+
+    /* Layout del icono: centrado y levemente hacia la derecha */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 4px;
+
+    /* Transiciones suaves */
+    transition:
+      left 0.3s ease,
+      opacity 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  #sidebar-tab:hover {
+    opacity: 0.9;
+    background-color: var(--color-surface-container-high);
+  }
+
+  #sidebar-tab .material-symbols-outlined {
+    font-size: 18px;
+  }
+
+  /* Estado abierto: tab sigue al borde derecho del drawer (w-72 = 18rem) */
+  #sidebar-tab[data-open="true"] {
+    left: 18rem;
+    opacity: 0.85;
+  }
+  #sidebar-tab[data-open="true"]:hover {
+    opacity: 1;
+  }
+  /* Tablet/Desktop (md+): el header ya tiene la nav, ocultar el tab.
+     NOTA: la media query aquí es necesaria porque el CSS { display: flex }
+     de arriba tiene más especificidad que Tailwind's md:hidden utility. */
+  @media (min-width: 768px) {
+    #sidebar-tab {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // AbortController allows us to cancel previous listeners when
+  // initSidebarDrawer runs again on the next page navigation.
+  let drawerController: AbortController | null = null;
+
+  function initSidebarDrawer() {
+    // Cancel listeners from the previous page
+    drawerController?.abort();
+    drawerController = new AbortController();
+    const signal = drawerController.signal;
+
+    const sidebar  = document.getElementById('app-sidebar') as HTMLElement | null;
+    const overlay  = document.getElementById('sidebar-overlay') as HTMLElement | null;
+    const tab      = document.getElementById('sidebar-tab') as HTMLButtonElement | null;
+    const tabIcon  = document.getElementById('tab-icon') as HTMLElement | null;
+
+    if (!sidebar || !tab) return;
+
+    const panel     = sidebar;
+    const toggleTab = tab;
+
+    function openSidebar() {
+      panel.classList.remove('-translate-x-full');
+      overlay?.classList.remove('hidden');
+      toggleTab.setAttribute('aria-expanded', 'true');
+      toggleTab.dataset.open = 'true';
+      if (tabIcon) tabIcon.textContent = 'chevron_left';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+      panel.classList.add('-translate-x-full');
+      overlay?.classList.add('hidden');
+      toggleTab.setAttribute('aria-expanded', 'false');
+      delete toggleTab.dataset.open;
+      if (tabIcon) tabIcon.textContent = 'chevron_right';
+      document.body.style.overflow = '';
+    }
+
+    toggleTab.addEventListener('click', () => {
+      const isOpen = toggleTab.getAttribute('aria-expanded') === 'true';
+      isOpen ? closeSidebar() : openSidebar();
+    }, { signal });
+
+    overlay?.addEventListener('click', closeSidebar, { signal });
+  }
+
+  document.addEventListener('astro:page-load', initSidebarDrawer);
+</script>
+
