@@ -1,0 +1,48 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AboutContent from '../../components/AboutContent.astro';
+import ContactForm from '../../components/ContactForm.astro';
+import { useTranslations } from '../../i18n/utils';
+
+const t = useTranslations('en');
+---
+
+<Layout>
+	<AboutContent lang="en" />
+
+	<!-- Contact Section -->
+	<section class="grid grid-cols-1 lg:grid-cols-12 gap-16 pt-24 border-t border-border-subtle px-8 md:px-16 max-w-7xl mx-auto" id="contact">
+		<div class="lg:col-span-5">
+			<h2 class="text-5xl font-headline font-bold tracking-tighter text-on-surface mb-8">GET IN TOUCH</h2>
+			<p class="text-on-surface-variant mb-12 max-w-sm">
+				Have a technical challenge or an editorial vision? Drop a message into the core and I will respond within 24 standard cycles.
+			</p>
+			<div class="space-y-8">
+				<div>
+					<label class="font-headline text-[10px] uppercase tracking-[0.2em] text-primary-container mb-2 block">Email</label>
+					<a class="text-xl sm:text-2xl font-light break-all text-text-heading hover:text-primary-container transition-colors" href="mailto:rubendarioqa99@gmail.com">rubendarioqa99@gmail.com</a>
+				</div>
+			</div>
+		</div>
+		<div class="lg:col-span-7">
+			<ContactForm lang="en" />
+		</div>
+	</section>
+
+	<script>
+		import { animate, inView } from "motion";
+
+		document.addEventListener("astro:page-load", () => {
+			// Este listener queda activo en toda la navegación: solo actúa en Sobre mí
+			if (!document.getElementById("contact")) return;
+
+			const elements = document.querySelectorAll<HTMLElement>("[data-reveal], #contact");
+			elements.forEach((el) => {
+				el.style.opacity = "0";
+				inView(el, () => {
+					animate(el as any, { opacity: [0, 1], y: [30, 0] }, { duration: 0.8, ease: [0.22, 1, 0.36, 1] });
+				}, { margin: "-10%" });
+			});
+		});
+	</script>
+</Layout>

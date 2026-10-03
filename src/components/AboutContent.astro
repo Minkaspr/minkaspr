@@ -1,0 +1,437 @@
+---
+// Contenido de "Sobre mí" compartido entre /about y /en/about.
+// El formulario de contacto sigue viviendo en cada página.
+import { projects, uniqueTechCount } from '../data/projects';
+
+interface Props {
+	lang: 'es' | 'en';
+}
+
+const { lang } = Astro.props;
+
+const devicon = (name: string, variant = 'original') =>
+	`https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${name}/${name}-${variant}.svg`;
+
+type Tech = { name: string; icon?: string; invertOnDark?: boolean };
+
+const texts = {
+	es: {
+		eyebrow: 'Desarrollador de software',
+		titleA: 'SOBRE',
+		titleB: 'MÍ.',
+		intro: 'Desarrollador de software en Lima. Trabajo en aplicaciones web y móviles, y me gusta acompañar un proyecto desde la idea hasta que está funcionando.',
+		facts: [
+			{ icon: 'location_on', label: 'Ubicación', value: 'Lima, Perú' },
+			{ icon: 'school', label: 'Formación', value: 'Bachiller en Ingeniería de Software' },
+			{ icon: 'devices', label: 'Enfoque', value: 'Web y Android' },
+			{ icon: 'translate', label: 'Idiomas', value: 'Español, Inglés' },
+		],
+		stats: { projects: 'Proyectos', techs: 'Tecnologías' },
+		figLabel: 'Lima, Perú',
+		photoAlt: 'Foto de Dario Quispe',
+		bioLabel: 'Un poco de mí',
+		bioTitle: 'Software que resuelve problemas concretos.',
+		blocks: [
+			{
+				title: 'Qué hago',
+				text: 'Me gusta construir software que resuelva problemas concretos. He trabajado en aplicaciones web y móviles y pasé por todas las etapas, desde la planificación y el diseño hasta el desarrollo y la implementación. Me interesa todo el proceso, porque una aplicación no solo tiene que funcionar, también tiene que ser cómoda de usar.',
+			},
+			{
+				title: 'Cómo trabajo',
+				text: 'Disfruto trabajar en equipo. Creo que buena parte de que un proyecto salga bien depende de comunicarse claro y cumplir con lo acordado, y siempre agradezco el feedback de otros desarrolladores. Fuera del código escucho mucha música y sigo aprendiendo cosas nuevas con videos y tutoriales.',
+			},
+		],
+		steps: ['Planificación', 'Diseño', 'Desarrollo', 'Implementación'],
+		traits: ['Trabajo en equipo', 'Comunicación', 'Feedback', 'Aprendizaje continuo'],
+		offCode: [
+			{ icon: 'headphones', text: 'Música' },
+			{ icon: 'play_circle', text: 'Tutoriales' },
+		],
+		nickLabel: 'Dato curioso',
+		nickText: 'Min es mi gato y Kasper mi perrito. Junté sus nombres, la E se perdió en el camino y así nació Minkaspr.',
+		pets: { min: 'Mi gato', kasper: 'Mi perrito' },
+		techLabel: 'Tecnologías',
+		techTitle: 'Con lo que construyo.',
+		techSubtitle: 'Las herramientas que fui usando en mis proyectos web y móviles.',
+		groups: {
+			languages: 'Lenguajes',
+			frameworks: 'Frameworks',
+			databases: 'Bases de datos',
+			tools: 'Herramientas',
+			methods: 'Metodologías',
+		},
+	},
+	en: {
+		eyebrow: 'Software developer',
+		titleA: 'ABOUT',
+		titleB: 'ME.',
+		intro: "Software developer based in Lima. I work on web and mobile apps, and I like being part of a project from the first idea until it's up and running.",
+		facts: [
+			{ icon: 'location_on', label: 'Location', value: 'Lima, Peru' },
+			{ icon: 'school', label: 'Education', value: "Bachelor's in Software Engineering" },
+			{ icon: 'devices', label: 'Focus', value: 'Web & Android' },
+			{ icon: 'translate', label: 'Languages', value: 'Spanish, English' },
+		],
+		stats: { projects: 'Projects', techs: 'Technologies' },
+		figLabel: 'Lima, Peru',
+		photoAlt: 'Photo of Dario Quispe',
+		bioLabel: 'A bit about me',
+		bioTitle: 'Software that solves real problems.',
+		blocks: [
+			{
+				title: 'What I do',
+				text: "I like building software that solves real problems. I've worked on web and mobile apps and gone through every stage, from planning and design to development and deployment. I care about the whole process, because an app doesn't just need to work, it also needs to be comfortable to use.",
+			},
+			{
+				title: 'How I work',
+				text: 'I enjoy working in a team. I think a big part of a project going well comes down to communicating clearly and following through, and I always appreciate feedback from other developers. Outside of code I listen to a lot of music and keep learning new things through videos and tutorials.',
+			},
+		],
+		steps: ['Planning', 'Design', 'Development', 'Deployment'],
+		traits: ['Teamwork', 'Communication', 'Feedback', 'Always learning'],
+		offCode: [
+			{ icon: 'headphones', text: 'Music' },
+			{ icon: 'play_circle', text: 'Tutorials' },
+		],
+		nickLabel: 'Fun fact',
+		nickText: 'Min is my cat and Kasper is my little dog. I put their names together, the E got lost along the way and Minkaspr was born.',
+		pets: { min: 'My cat', kasper: 'My little dog' },
+		techLabel: 'Technologies',
+		techTitle: 'What I build with.',
+		techSubtitle: "The tools I've used across my web and mobile projects.",
+		groups: {
+			languages: 'Languages',
+			frameworks: 'Frameworks',
+			databases: 'Databases',
+			tools: 'Tools',
+			methods: 'Methodologies',
+		},
+	},
+}[lang];
+
+const techGroups: { title: string; items: Tech[]; wide?: boolean }[] = [
+	{
+		title: texts.groups.languages,
+		items: [
+			{ name: 'Java', icon: devicon('java') },
+			{ name: 'JavaScript', icon: devicon('javascript') },
+			{ name: 'TypeScript', icon: devicon('typescript') },
+		],
+	},
+	{
+		title: texts.groups.frameworks,
+		items: [
+			{ name: 'Angular', icon: devicon('angular') },
+			{ name: 'Spring Boot', icon: devicon('spring') },
+			{ name: 'Tailwind CSS', icon: devicon('tailwindcss') },
+			{ name: 'Bootstrap', icon: devicon('bootstrap') },
+		],
+	},
+	{
+		title: texts.groups.databases,
+		items: [
+			{ name: 'MySQL', icon: devicon('mysql') },
+			{ name: 'PostgreSQL', icon: devicon('postgresql') },
+			{ name: 'SQLite', icon: devicon('sqlite') },
+		],
+	},
+	{
+		title: texts.groups.tools,
+		wide: true,
+		items: [
+			{ name: 'Git', icon: devicon('git') },
+			{ name: 'GitHub', icon: devicon('github'), invertOnDark: true },
+			{ name: 'IntelliJ IDEA', icon: devicon('intellij') },
+			{ name: 'VS Code', icon: devicon('vscode') },
+			{ name: 'Android Studio', icon: devicon('androidstudio') },
+			{ name: 'Figma', icon: devicon('figma') },
+		],
+	},
+	{
+		title: texts.groups.methods,
+		items: [
+			{ name: 'Scrum' },
+			{ name: 'Kanban' },
+			{ name: 'Jira', icon: devicon('jira') },
+		],
+	},
+];
+---
+
+<!-- ① INTRO: título, ficha y foto -->
+<section class="pt-16 pb-24 px-8 md:px-16 max-w-7xl mx-auto">
+	<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+		<div class="lg:col-span-7" data-reveal>
+			<span class="font-headline uppercase tracking-widest text-primary-container text-xs mb-4 block">{texts.eyebrow}</span>
+			<h1 class="text-6xl md:text-8xl font-headline font-bold tracking-tighter text-on-surface leading-none">
+				{texts.titleA}<br/><span class="text-primary-container">{texts.titleB}</span>
+			</h1>
+			<p class="mt-8 text-lg md:text-xl text-on-surface-variant font-light leading-relaxed max-w-xl">{texts.intro}</p>
+
+			<dl class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl">
+				{texts.facts.map((fact) => (
+					<div class="flex items-start gap-3 bg-surface-container-low rounded-md px-4 py-3">
+						<span class="material-symbols-outlined text-primary-container text-xl mt-0.5">{fact.icon}</span>
+						<div>
+							<dt class="font-headline text-[10px] uppercase tracking-widest text-on-surface-muted">{fact.label}</dt>
+							<dd class="text-sm text-on-surface font-medium">{fact.value}</dd>
+						</div>
+					</div>
+				))}
+			</dl>
+
+			<div class="mt-8 flex flex-wrap items-center gap-x-10 gap-y-4">
+				<div>
+					<span class="block text-3xl font-headline font-bold text-text-heading">{projects.length}</span>
+					<span class="block font-headline text-[10px] text-on-surface-muted uppercase tracking-widest">{texts.stats.projects}</span>
+				</div>
+				<div>
+					<span class="block text-3xl font-headline font-bold text-text-heading">{uniqueTechCount}</span>
+					<span class="block font-headline text-[10px] text-on-surface-muted uppercase tracking-widest">{texts.stats.techs}</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="lg:col-span-5 flex justify-center lg:justify-end" data-reveal>
+			<!-- Foto como lámina impresa: marcas de corte en las esquinas y pie de figura -->
+			<figure class="w-full max-w-sm">
+				<div class="photo-plate relative p-3">
+					<span class="crop-mark top-0 left-0 border-t border-l"></span>
+					<span class="crop-mark top-0 right-0 border-t border-r"></span>
+					<span class="crop-mark bottom-0 left-0 border-b border-l"></span>
+					<span class="crop-mark bottom-0 right-0 border-b border-r"></span>
+					<div class="aspect-4/5 overflow-hidden bg-[#F6F6F7]">
+						<img src="/profile.jpg" alt={texts.photoAlt} class="w-full h-full object-cover object-top grayscale-[0.35] transition-[filter] duration-700 hover:grayscale-0" />
+					</div>
+				</div>
+				<figcaption class="mt-4 px-3 flex items-end justify-between gap-4">
+					<div>
+						<span class="block font-headline text-[10px] uppercase tracking-widest text-on-surface-muted">{texts.figLabel}</span>
+						<span class="block font-headline font-bold text-on-surface">Dario Quispe</span>
+					</div>
+					<a
+						href="https://github.com/Minkaspr"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="group flex items-center gap-2 text-on-surface-variant hover:text-primary-container transition-colors"
+					>
+						<img src="https://github.com/Minkaspr.png?size=64" alt="" loading="lazy" class="w-7 h-7 rounded-full" />
+						<span class="font-headline text-xs">@Minkaspr</span>
+						<span class="material-symbols-outlined text-sm transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">north_east</span>
+					</a>
+				</figcaption>
+			</figure>
+		</div>
+	</div>
+</section>
+
+<!-- ② BIO: qué hago / cómo trabajo -->
+<section class="bg-surface-container-low py-24 px-8 md:px-16">
+	<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+		<div class="lg:col-span-4" data-reveal>
+			<div class="lg:sticky lg:top-28">
+				<span class="font-headline uppercase tracking-widest text-primary-container text-xs mb-4 block">{texts.bioLabel}</span>
+				<h2 class="text-4xl md:text-5xl font-headline font-bold tracking-tighter text-on-surface leading-tight">{texts.bioTitle}</h2>
+			</div>
+		</div>
+
+		<div class="lg:col-span-8 space-y-6">
+			<!-- 01 Qué hago + etapas -->
+			<article class="bg-surface-container rounded-md p-8 md:p-10" data-reveal>
+				<div class="flex items-baseline gap-4 mb-5">
+					<span class="font-headline text-4xl font-bold text-primary-container/70">01</span>
+					<h3 class="font-headline text-2xl font-bold text-text-heading">{texts.blocks[0].title}</h3>
+				</div>
+				<p class="text-on-surface-variant leading-relaxed text-lg">{texts.blocks[0].text}</p>
+				<ol class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3">
+					{texts.steps.map((step, i) => (
+						<li class="bg-surface-container-lowest rounded-md px-4 py-4">
+							<span class="block font-headline text-[10px] tracking-widest text-primary-container mb-1">0{i + 1}</span>
+							<span class="block text-sm font-medium text-on-surface">{step}</span>
+						</li>
+					))}
+				</ol>
+			</article>
+
+			<!-- 02 Cómo trabajo + rasgos -->
+			<article class="bg-surface-container rounded-md p-8 md:p-10" data-reveal>
+				<div class="flex items-baseline gap-4 mb-5">
+					<span class="font-headline text-4xl font-bold text-primary-container/70">02</span>
+					<h3 class="font-headline text-2xl font-bold text-text-heading">{texts.blocks[1].title}</h3>
+				</div>
+				<p class="text-on-surface-variant leading-relaxed text-lg">{texts.blocks[1].text}</p>
+				<div class="mt-8 flex flex-wrap items-center gap-2">
+					{texts.traits.map((trait) => (
+						<span class="inline-flex items-center h-8 px-3 leading-none bg-surface-container-lowest text-on-surface-variant text-xs font-headline rounded-sm uppercase tracking-wider">{trait}</span>
+					))}
+					{texts.offCode.map((item) => (
+						<span class="inline-flex items-center h-8 px-3 leading-none bg-primary-container/10 text-primary-container text-xs font-headline rounded-sm uppercase tracking-wider gap-1.5">
+							<span class="material-symbols-outlined text-sm">{item.icon}</span>
+							{item.text}
+						</span>
+					))}
+				</div>
+			</article>
+
+			<!-- Dato curioso: de dónde sale Minkaspr -->
+			<article class="relative overflow-hidden bg-primary-container text-on-primary-container rounded-md p-8 md:p-10" data-reveal>
+				<!-- Huellitas que cruzan la tarjeta -->
+				<svg class="paw-trail absolute -right-4 top-0 h-full w-56 pointer-events-none" viewBox="0 0 200 320" aria-hidden="true">
+					<defs>
+						<symbol id="paw" viewBox="0 0 24 24">
+							<circle cx="5.5" cy="9.5" r="2.2" /><circle cx="9.5" cy="5.5" r="2.2" /><circle cx="14.5" cy="5.5" r="2.2" /><circle cx="18.5" cy="9.5" r="2.2" />
+							<path d="M12 11c-3 0-6 3.5-6 6.2 0 1.8 1.4 2.8 3 2.8 1.2 0 2-.6 3-.6s1.8.6 3 .6c1.6 0 3-1 3-2.8 0-2.7-3-6.2-6-6.2z" />
+						</symbol>
+					</defs>
+					<g transform="rotate(-20 53 283)"><use class="paw" style="--i: 0" href="#paw" x="40" y="270" width="26" height="26" /></g>
+					<g transform="rotate(-10 103 238)"><use class="paw" style="--i: 1" href="#paw" x="90" y="225" width="26" height="26" /></g>
+					<g transform="rotate(-20 83 178)"><use class="paw" style="--i: 2" href="#paw" x="70" y="165" width="26" height="26" /></g>
+					<g transform="rotate(-10 133 128)"><use class="paw" style="--i: 3" href="#paw" x="120" y="115" width="26" height="26" /></g>
+					<g transform="rotate(-20 113 68)"><use class="paw" style="--i: 4" href="#paw" x="100" y="55" width="26" height="26" /></g>
+					<g transform="rotate(-10 163 18)"><use class="paw" style="--i: 5" href="#paw" x="150" y="5" width="26" height="26" /></g>
+				</svg>
+
+				<span class="relative font-headline uppercase tracking-widest text-[10px] opacity-80 mb-8 flex items-center gap-2">
+					<span class="material-symbols-outlined text-base">auto_awesome</span>
+					{texts.nickLabel}
+				</span>
+
+				<div class="relative flex flex-wrap items-center gap-x-5 gap-y-6">
+					<!-- Íconos de gato y perro: Lucide (lucide.dev, licencia ISC) -->
+					<!-- Min -->
+					<div class="pet flex items-center gap-4">
+						<span class="pet-avatar w-16 h-16 rounded-full flex items-center justify-center">
+							<svg class="pet-icon w-9 h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+								<path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z" />
+								<path d="M8 14v.5" />
+								<path d="M16 14v.5" />
+								<path d="M11.25 16.25h1.5L12 17l-.75-.75Z" />
+							</svg>
+						</span>
+						<div>
+							<span class="block font-headline text-3xl font-bold tracking-tighter leading-none">Min</span>
+							<span class="block font-headline text-[10px] uppercase tracking-widest opacity-80 mt-1.5">{texts.pets.min}</span>
+						</div>
+					</div>
+
+					<span class="material-symbols-outlined text-2xl opacity-40" aria-hidden="true">favorite</span>
+
+					<!-- Kasper -->
+					<div class="pet flex items-center gap-4">
+						<span class="pet-avatar w-16 h-16 rounded-full flex items-center justify-center">
+							<svg class="pet-icon w-9 h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+								<path d="M11.25 16.25h1.5L12 17z" />
+								<path d="M16 14v.5" />
+								<path d="M4.42 11.247A13.152 13.152 0 0 0 4 14.556C4 18.728 7.582 21 12 21s8-2.272 8-6.444a11.702 11.702 0 0 0-.493-3.309" />
+								<path d="M8 14v.5" />
+								<path d="M8.5 8.5c-.384 1.05-1.083 2.028-2.344 2.5-1.931.722-3.576-.297-3.656-1-.113-.994 1.177-6.53 4-7 1.923-.321 3.651.845 3.651 2.235A7.497 7.497 0 0 1 14 5.277c0-1.39 1.844-2.598 3.767-2.277 2.823.47 4.113 6.006 4 7-.08.703-1.725 1.722-3.656 1-1.261-.472-1.855-1.45-2.239-2.5" />
+							</svg>
+						</span>
+						<div>
+							<span class="block font-headline text-3xl font-bold tracking-tighter leading-none">Kasper</span>
+							<span class="block font-headline text-[10px] uppercase tracking-widest opacity-80 mt-1.5">{texts.pets.kasper}</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- La palabra final, con la E que se escapa -->
+				<p class="relative mt-10 font-headline text-5xl md:text-6xl font-bold tracking-tighter leading-none" aria-label="Minkaspr">
+					<span aria-hidden="true">MIN</span><span aria-hidden="true" class="opacity-60">KASP</span><span aria-hidden="true" class="relative opacity-60">R<span class="lost-e absolute -top-5 -left-4 text-2xl">E</span></span>
+				</p>
+				<p class="relative mt-5 opacity-80 max-w-md">{texts.nickText}</p>
+			</article>
+		</div>
+	</div>
+</section>
+
+<!-- ③ TECNOLOGÍAS -->
+<section class="py-24 px-8 md:px-16 max-w-7xl mx-auto">
+	<div class="mb-12" data-reveal>
+		<span class="font-headline uppercase tracking-widest text-primary-container text-xs mb-4 block">{texts.techLabel}</span>
+		<h2 class="text-4xl md:text-5xl font-headline font-bold tracking-tighter text-on-surface">{texts.techTitle}</h2>
+		<p class="mt-4 text-on-surface-variant max-w-lg">{texts.techSubtitle}</p>
+	</div>
+
+	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+		{techGroups.map((group) => (
+			<div class:list={['bg-surface-container rounded-md p-6 md:p-8', group.wide && 'lg:col-span-2']} data-reveal>
+				<h3 class="font-headline text-[10px] uppercase tracking-[0.2em] text-primary-container mb-5">{group.title}</h3>
+				<ul class="flex flex-wrap gap-2">
+					{group.items.map((tech) => (
+						<li class="flex items-center gap-2 bg-surface-container-lowest rounded-sm px-3 py-2">
+							{tech.icon ? (
+								<img src={tech.icon} alt="" loading="lazy" class:list={['w-5 h-5', tech.invertOnDark && 'dark:invert']} />
+							) : (
+								<span class="w-1.5 h-1.5 rounded-full bg-primary-container mx-1.5"></span>
+							)}
+							<span class="text-sm text-on-surface">{tech.name}</span>
+						</li>
+					))}
+				</ul>
+			</div>
+		))}
+	</div>
+</section>
+
+<style>
+	/* Marcas de corte tipo imprenta en las esquinas de la foto */
+	.crop-mark {
+		position: absolute;
+		width: 1.25rem;
+		height: 1.25rem;
+		border-color: var(--color-primary-container);
+		pointer-events: none;
+	}
+
+	.pet-avatar {
+		background-color: color-mix(in srgb, var(--color-on-primary-container) 10%, transparent);
+	}
+	.paw-trail {
+		fill: var(--color-on-primary-container);
+		opacity: 0.14;
+	}
+
+	/* Huellitas caminando: aparecen una tras otra con un fundido suave y se borran igual */
+	.paw {
+		opacity: 0;
+		animation: paw-step 5.4s ease-in-out infinite;
+		animation-delay: calc(var(--i) * 0.45s);
+	}
+	@keyframes paw-step {
+		0% { opacity: 0; }
+		20%, 55% { opacity: 1; }
+		75%, 100% { opacity: 0; }
+	}
+
+	/* Las mascotas mueven la cabeza al pasar el mouse */
+	.pet:hover .pet-icon {
+		animation: pet-wiggle 0.6s ease-in-out;
+	}
+	@keyframes pet-wiggle {
+		0%, 100% { transform: rotate(0); }
+		25% { transform: rotate(-12deg); }
+		75% { transform: rotate(10deg); }
+	}
+
+	/* La E que se perdió en el camino */
+	.lost-e {
+		animation: lost-e 4s ease-in-out infinite;
+	}
+	@keyframes lost-e {
+		0% { opacity: 0.5; transform: translate(0, 0) rotate(-8deg); }
+		60% { opacity: 0.15; transform: translate(-6px, -14px) rotate(-24deg); }
+		61% { opacity: 0; }
+		100% { opacity: 0.5; transform: translate(0, 0) rotate(-8deg); }
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.paw {
+			animation: none;
+			opacity: 1;
+		}
+		.lost-e,
+		.pet:hover .pet-icon {
+			animation: none;
+		}
+	}
+</style>
