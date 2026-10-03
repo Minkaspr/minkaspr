@@ -1,0 +1,287 @@
+---
+// Formulario de contacto: valida con Zod en el navegador y envía con Web3Forms.
+// La clave va en .env como PUBLIC_WEB3FORMS_KEY (ver .env.example).
+interface Props {
+	lang: 'es' | 'en';
+}
+
+const { lang } = Astro.props;
+
+const LIMITS = { name: { min: 2, max: 80 }, email: { max: 254 }, message: { min: 10, max: 1000 } };
+
+const texts = {
+	es: {
+		name: 'Nombre',
+		email: 'Email',
+		message: 'Mensaje',
+		namePh: 'Tu nombre...',
+		emailPh: 'tu@email.com',
+		messagePh: 'Cuéntame un poco...',
+		send: 'ENVIAR',
+		sending: 'ENVIANDO...',
+		errors: {
+			required: 'Este campo es obligatorio',
+			nameMin: `Escribe al menos ${LIMITS.name.min} caracteres`,
+			nameMax: `Máximo ${LIMITS.name.max} caracteres`,
+			email: 'Escribe un correo válido, por ejemplo nombre@dominio.com',
+			emailMax: `Máximo ${LIMITS.email.max} caracteres`,
+			messageMin: `Escribe al menos ${LIMITS.message.min} caracteres`,
+			messageMax: `Máximo ${LIMITS.message.max} caracteres`,
+		},
+		success: '¡Gracias! Tu mensaje llegó, te respondo pronto.',
+		fallback: 'No pude recibir tu mensaje en este momento. Para no perder lo que escribiste, puedes',
+		fallbackLink: 'enviarlo desde tu correo',
+		cooldown: 'Ya enviaste un mensaje hace poco. Podrás enviar otro en {s} segundos.',
+		subject: 'Nuevo mensaje desde el portafolio',
+	},
+	en: {
+		name: 'Name',
+		email: 'Email',
+		message: 'Message',
+		namePh: 'Your name...',
+		emailPh: 'you@email.com',
+		messagePh: 'Tell me a bit...',
+		send: 'SEND',
+		sending: 'SENDING...',
+		errors: {
+			required: 'This field is required',
+			nameMin: `Use at least ${LIMITS.name.min} characters`,
+			nameMax: `${LIMITS.name.max} characters max`,
+			email: 'Enter a valid email, like name@domain.com',
+			emailMax: `${LIMITS.email.max} characters max`,
+			messageMin: `Use at least ${LIMITS.message.min} characters`,
+			messageMax: `${LIMITS.message.max} characters max`,
+		},
+		success: 'Thanks! Your message arrived, I will get back to you soon.',
+		fallback: "I couldn't receive your message right now. So you don't lose what you wrote, you can",
+		fallbackLink: 'send it from your email',
+		cooldown: 'You sent a message recently. You can send another one in {s} seconds.',
+		subject: 'New message from the portfolio',
+	},
+}[lang];
+
+const accessKey = import.meta.env.PUBLIC_WEB3FORMS_KEY ?? '';
+const CONTACT_EMAIL = 'rubendarioqa99@gmail.com';
+
+const inputClass =
+	'w-full bg-surface-container-highest border-none rounded-sm p-4 text-input-text placeholder-input-placeholder outline-none focus:ring-2 focus:ring-primary-container aria-invalid:ring-2 aria-invalid:ring-error transition-[box-shadow] duration-200';
+const labelClass = 'font-headline text-[10px] uppercase tracking-widest text-on-surface-variant';
+const errorClass = 'field-error text-xs text-error min-h-4';
+---
+
+<form
+	id="contact-form"
+	class="space-y-6"
+	novalidate
+	data-key={accessKey}
+	data-email={CONTACT_EMAIL}
+	data-texts={JSON.stringify(texts)}
+	data-limits={JSON.stringify(LIMITS)}
+>
+	<!-- Trampa para bots: los humanos no la ven ni la llenan -->
+	<input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" />
+
+	<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+		<div class="space-y-2">
+			<label class={labelClass} for="name">{texts.name}</label>
+			<input class={inputClass} id="name" name="name" type="text" autocomplete="name" placeholder={texts.namePh} maxlength={LIMITS.name.max} aria-describedby="name-error" />
+			<p id="name-error" class={errorClass} aria-live="polite"></p>
+		</div>
+		<div class="space-y-2">
+			<label class={labelClass} for="email">{texts.email}</label>
+			<input class={inputClass} id="email" name="email" type="email" autocomplete="email" placeholder={texts.emailPh} maxlength={LIMITS.email.max} aria-describedby="email-error" />
+			<p id="email-error" class={errorClass} aria-live="polite"></p>
+		</div>
+	</div>
+
+	<div class="space-y-2">
+		<div class="flex items-baseline justify-between">
+			<label class={labelClass} for="message">{texts.message}</label>
+			<span id="message-count" class="font-headline text-[10px] tracking-widest text-on-surface-muted">0 / {LIMITS.message.max}</span>
+		</div>
+		<textarea class:list={[inputClass, 'resize-y min-h-36 max-h-96']} id="message" name="message" placeholder={texts.messagePh} rows="6" maxlength={LIMITS.message.max} aria-describedby="message-error"></textarea>
+		<p id="message-error" class={errorClass} aria-live="polite"></p>
+	</div>
+
+	<div class="flex flex-col md:flex-row md:items-center gap-4">
+		<button
+			type="submit"
+			disabled
+			class="group relative flex items-center justify-center w-full md:w-auto px-12 py-4 bg-primary-container text-on-primary-container font-bold rounded-sm overflow-hidden transition-shadow hover:shadow-[0_8px_24px_rgba(0,92,120,0.35)] dark:hover:shadow-[0_0_30px_rgba(79,195,247,0.4)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+		>
+			<span class="relative z-10 flex items-center gap-2">
+				<span class="submit-label">{texts.send}</span>
+				<span class="material-symbols-outlined text-sm">send</span>
+			</span>
+		</button>
+		<p id="form-status" class="text-sm" role="status" aria-live="polite"></p>
+	</div>
+</form>
+
+<script>
+	import { z } from 'astro/zod';
+
+	const COOLDOWN_MS = 60_000; // un envío por minuto por navegador
+	const MIN_FILL_MS = 3_000; // un humano tarda más que esto en llenar el formulario
+	const STORAGE_KEY = 'contact:lastSent';
+
+	const readLastSent = () => {
+		try {
+			return Number(localStorage.getItem(STORAGE_KEY)) || 0;
+		} catch {
+			return 0;
+		}
+	};
+	const saveLastSent = () => {
+		try {
+			localStorage.setItem(STORAGE_KEY, String(Date.now()));
+		} catch {}
+	};
+
+	document.addEventListener('astro:page-load', () => {
+		const form = document.querySelector<HTMLFormElement>('#contact-form');
+		if (!form) return;
+
+		const t = JSON.parse(form.dataset.texts!);
+		const L = JSON.parse(form.dataset.limits!);
+		const accessKey = form.dataset.key;
+		const contactEmail = form.dataset.email!;
+		const loadedAt = Date.now();
+
+		const schema = z.object({
+			name: z.string().trim().min(1, t.errors.required).min(L.name.min, t.errors.nameMin).max(L.name.max, t.errors.nameMax),
+			email: z.string().trim().min(1, t.errors.required).max(L.email.max, t.errors.emailMax).pipe(z.email(t.errors.email)),
+			message: z.string().trim().min(1, t.errors.required).min(L.message.min, t.errors.messageMin).max(L.message.max, t.errors.messageMax),
+		});
+		type Field = keyof z.infer<typeof schema>;
+		const fields: Field[] = ['name', 'email', 'message'];
+
+		const input = (f: Field) => form.elements.namedItem(f) as HTMLInputElement | HTMLTextAreaElement;
+		const status = form.querySelector<HTMLElement>('#form-status')!;
+		const button = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+		const label = form.querySelector<HTMLElement>('.submit-label')!;
+		const counter = form.querySelector<HTMLElement>('#message-count')!;
+		const touched = new Set<Field>();
+		let sending = false;
+
+		const values = () => Object.fromEntries(fields.map((f) => [f, input(f).value])) as Record<Field, string>;
+
+		const showErrors = (only?: Field) => {
+			const result = schema.safeParse(values());
+			const issues = result.success ? [] : result.error.issues;
+			for (const f of fields) {
+				if (only && f !== only) continue;
+				if (!only && !touched.has(f)) continue;
+				const issue = issues.find((i) => i.path[0] === f);
+				const el = input(f);
+				form.querySelector<HTMLElement>(`#${f}-error`)!.textContent = issue?.message ?? '';
+				if (issue) el.setAttribute('aria-invalid', 'true');
+				else el.removeAttribute('aria-invalid');
+			}
+			return result;
+		};
+
+		// Si el envío falla (sin clave, límite del plan, red caída...) ofrecemos
+		// mandar el mismo mensaje desde el correo de la persona, ya prellenado.
+		const showFallback = (data: Record<Field, string>) => {
+			const subject = encodeURIComponent(`${t.subject} · ${data.name}`);
+			const body = encodeURIComponent(`${data.message}\n\n${data.name}`);
+			const link = document.createElement('a');
+			link.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
+			link.textContent = t.fallbackLink;
+			link.className = 'font-bold underline underline-offset-2 text-primary-container';
+			status.className = 'text-sm text-on-surface-variant';
+			status.replaceChildren(`${t.fallback} `, link, '.');
+		};
+
+		// El botón solo se habilita cuando todo es válido y no hay un envío en curso
+		const updateButton = () => {
+			button.disabled = sending || !schema.safeParse(values()).success;
+		};
+
+		const setStatus = (text: string, kind: 'ok' | 'error' | '' = '') => {
+			status.textContent = text;
+			status.className = `text-sm ${kind === 'ok' ? 'text-primary-container' : kind === 'error' ? 'text-error' : 'text-on-surface-muted'}`;
+		};
+
+		for (const f of fields) {
+			const el = input(f);
+			el.addEventListener('blur', () => {
+				// Quita espacios al inicio y al final cuando sales del campo
+				el.value = el.value.trim();
+				touched.add(f);
+				showErrors(f);
+			});
+			el.addEventListener('input', () => {
+				if (touched.has(f)) showErrors(f);
+				if (f === 'message') counter.textContent = `${el.value.length} / ${L.message.max}`;
+				updateButton();
+			});
+		}
+		updateButton();
+
+		form.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			fields.forEach((f) => touched.add(f));
+			const result = showErrors();
+			if (!result.success) {
+				input(result.error.issues[0].path[0] as Field).focus();
+				return;
+			}
+
+			// Bot: llenó la trampa o mandó el formulario al instante. Fingimos éxito sin enviar.
+			const bot = (form.elements.namedItem('botcheck') as HTMLInputElement).checked;
+			if (bot || Date.now() - loadedAt < MIN_FILL_MS) {
+				form.reset();
+				updateButton();
+				setStatus(t.success, 'ok');
+				return;
+			}
+
+			const wait = COOLDOWN_MS - (Date.now() - readLastSent());
+			if (wait > 0) {
+				setStatus(t.cooldown.replace('{s}', String(Math.ceil(wait / 1000))), 'error');
+				return;
+			}
+
+			if (!accessKey) {
+				console.warn('[ContactForm] Falta PUBLIC_WEB3FORMS_KEY en .env, el formulario no puede enviar.');
+				showFallback(result.data);
+				return;
+			}
+
+			sending = true;
+			updateButton();
+			label.textContent = t.sending;
+			setStatus('');
+
+			try {
+				const res = await fetch('https://api.web3forms.com/submit', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+					body: JSON.stringify({
+						access_key: accessKey,
+						subject: `${t.subject} · ${result.data.name}`,
+						from_name: 'Minkaspr',
+						...result.data,
+					}),
+				});
+				const data = await res.json();
+				if (!res.ok || !data.success) throw new Error(data.message);
+
+				saveLastSent();
+				form.reset();
+				touched.clear();
+				counter.textContent = `0 / ${L.message.max}`;
+				setStatus(t.success, 'ok');
+			} catch (err) {
+				console.warn('[ContactForm] Web3Forms rechazó el envío', err);
+				showFallback(result.data);
+			} finally {
+				sending = false;
+				label.textContent = t.send;
+				updateButton();
+			}
+		});
+	});
+</script>
