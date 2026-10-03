@@ -12,8 +12,9 @@ const navItems = [
   { name: t('nav.about'), path: '/about/', icon: 'person' },
 ];
 
-// Texto localizado para el CTA
-const hireMeLabel = lang === 'es' ? 'Contratar' : 'Hire Me';
+// CTA: lleva al formulario de contacto en Sobre mí
+const ctaLabel = lang === 'es' ? 'Escríbeme' : 'Get in touch';
+const ctaHref = `${translatePath('/about/')}#contact`;
 ---
 
 <!-- =====================================================
@@ -37,7 +38,7 @@ const hireMeLabel = lang === 'es' ? 'Contratar' : 'Hire Me';
   transition:name="app-sidebar"
   transition:animate="none"
   class="
-    fixed left-0 top-0 h-screen w-72 z-50
+    fixed left-0 top-0 h-dvh w-72 z-50 flex flex-col
     md:hidden
     -translate-x-full
     transition-transform duration-300 ease-in-out
@@ -71,7 +72,7 @@ const hireMeLabel = lang === 'es' ? 'Contratar' : 'Hire Me';
             <a
               href={translatePath(item.path)}
               aria-current={isActive ? 'page' : undefined}
-              class="sidebar-nav-item"
+              class="sidebar-nav-item sidebar-link"
               data-active={String(isActive)}
             >
               <span
@@ -88,14 +89,16 @@ const hireMeLabel = lang === 'es' ? 'Contratar' : 'Hire Me';
     </ul>
   </nav>
 
-  <!-- CTA -->
-  <div class="absolute bottom-8 left-0 right-0 px-6">
-    <button
-      class="w-full py-3 font-headline uppercase tracking-widest text-[10px] font-bold rounded-lg"
+  <!-- CTA: al final del panel, respetando el área segura inferior del teléfono -->
+  <div class="mt-auto px-6 pt-6 sidebar-cta">
+    <a
+      href={ctaHref}
+      class="sidebar-link flex items-center justify-center gap-2 w-full py-3 font-headline uppercase tracking-widest text-[10px] font-bold rounded-lg"
       style="background-color: var(--color-primary-container); color: var(--color-on-primary-container);"
     >
-      {hireMeLabel}
-    </button>
+      <span class="material-symbols-outlined text-base">mail</span>
+      {ctaLabel}
+    </a>
   </div>
 </aside>
 
@@ -149,10 +152,14 @@ const hireMeLabel = lang === 'es' ? 'Contratar' : 'Hire Me';
     color: var(--color-primary-container);
   }
 
+  .sidebar-cta {
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+  }
+
   /* ---- Tab toggle — semicírculo en la parte inferior izquierda ---- */
   #sidebar-tab {
-    /* Posición: inferior izquierda, a la altura del botón CTA */
-    bottom: 2.5rem;
+    /* Posición: inferior izquierda, a la altura del botón CTA y sobre el área segura */
+    bottom: calc(2.5rem + env(safe-area-inset-bottom));
     left: 0;
 
     /* Forma: media pastilla que apunta hacia la derecha */
@@ -214,6 +221,11 @@ const hireMeLabel = lang === 'es' ? 'Contratar' : 'Hire Me';
 </style>
 
 <script>
+  import { navigate } from 'astro:transitions/client';
+
+  // Duración de la animación del panel (duration-300)
+  const SLIDE_MS = 300;
+
   // AbortController allows us to cancel previous listeners when
   // initSidebarDrawer runs again on the next page navigation.
   let drawerController: AbortController | null = null;
@@ -258,6 +270,31 @@ const hireMeLabel = lang === 'es' ? 'Contratar' : 'Hire Me';
     }, { signal });
 
     overlay?.addEventListener('click', closeSidebar, { signal });
+
+    // Al tocar un enlace con el panel abierto, primero se cierra deslizándose
+    // y después se navega. Así la página nueva no aparece con el panel a medio cerrar.
+    panel.querySelectorAll<HTMLAnchorElement>('a.sidebar-link').forEach((link) => {
+      link.addEventListener('click', (e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+        e.preventDefault();
+        const target = new URL(link.href, location.href);
+        closeSidebar();
+        const samePage = target.pathname === location.pathname;
+        setTimeout(() => {
+          if (samePage && target.hash) {
+            document.querySelector(target.hash)?.scrollIntoView({ behavior: 'smooth' });
+            history.replaceState(null, '', target.hash);
+          } else if (!samePage) {
+            navigate(target.pathname + target.hash);
+          }
+        }, SLIDE_MS);
+      }, { signal });
+    });
+
+    // Cerrar con Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && toggleTab.dataset.open) closeSidebar();
+    }, { signal });
   }
 
   document.addEventListener('astro:page-load', initSidebarDrawer);
