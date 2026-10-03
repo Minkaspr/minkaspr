@@ -93,6 +93,14 @@ Después de cambiar `.env` hay que reiniciar `pnpm dev`.
 - No combines `transition-all` de Tailwind con elementos que anima Motion, porque se pelean y la animación se retrasa.
 - Preferir fundidos suaves y siempre respetar `prefers-reduced-motion`.
 
+### SEO y vista previa en redes
+
+- Las etiquetas para Google y redes sociales (título, descripción, canonical, hreflang, Open Graph, Twitter/X y datos estructurados de persona) salen de [`src/components/Seo.astro`](../src/components/Seo.astro).
+- Cada página puede pasar su propio título y descripción al layout, por ejemplo `<Layout title="Proyectos" description="...">`. Sin título se usa "Dario Quispe · Desarrollador de software".
+- Las imágenes que aparecen al compartir un enlace son [`public/og-es.png`](../public/og-es.png) y [`public/og-en.png`](../public/og-en.png), de 1200×630. Si cambias tu foto o tu rol, hay que regenerarlas.
+- El sitemap se genera solo al hacer `pnpm build` (`/sitemap-index.xml`) y [`public/robots.txt`](../public/robots.txt) lo anuncia a los buscadores.
+- Para revisar cómo se ve un enlace al compartirlo puedes usar [opengraph.xyz](https://www.opengraph.xyz) o el [Post Inspector de LinkedIn](https://www.linkedin.com/post-inspector/).
+
 ### Favicon
 
 [`public/favicon.svg`](../public/favicon.svg) es un monograma "M" que cambia de color según el tema del navegador. `favicon.ico` y `apple-touch-icon.png` son copias en PNG/ICO generadas a partir del SVG, así que si cambias el SVG hay que regenerarlas (por ejemplo con `sharp`).

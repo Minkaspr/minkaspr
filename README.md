@@ -7,7 +7,7 @@
 Desarrollador de software en Lima, Perú 🇵🇪<br/>
 Construyo aplicaciones web y móviles, y me gusta acompañar un proyecto desde la idea hasta que está funcionando.
 
-[![Portafolio](https://img.shields.io/badge/Portafolio-4fc3f7?style=for-the-badge&logo=astro&logoColor=04212e)](https://portfolio-plum-iota-60.vercel.app/)
+[![Portafolio](https://img.shields.io/badge/Portafolio-4fc3f7?style=for-the-badge&logo=astro&logoColor=04212e)](https://minkaspr.com)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/dario-quispe-mk/)
 [![Email](https://img.shields.io/badge/Email-005c78?style=for-the-badge&logo=gmail&logoColor=white)](mailto:rubendarioqa99@gmail.com)
 
