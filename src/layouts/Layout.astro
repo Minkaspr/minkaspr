@@ -3,8 +3,15 @@
 import { ClientRouter } from "astro:transitions";
 import Header from "../components/Header.astro";
 import Sidebar from "../components/Sidebar.astro";
+import Seo from "../components/Seo.astro";
 import { getLangFromUrl } from "../i18n/utils";
 import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+}
 
 const lang = getLangFromUrl(Astro.url);
 ---
@@ -13,13 +20,13 @@ const lang = getLangFromUrl(Astro.url);
 <html lang={lang} class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <!-- Favicon: el SVG cambia de color con el tema del navegador; el .ico es respaldo -->
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="generator" content={Astro.generator} />
-    <title>Minkaspr | Portafolio de Dario Quispe</title>
+    <Seo {...Astro.props} />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://minkaspr.com/sitemap-index.xml
