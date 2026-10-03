@@ -4,8 +4,8 @@ Guía para levantar, modificar y publicar el portafolio.
 
 ## Requisitos
 
-- **Node.js 22.12 o superior** (lo pide `package.json` en `engines`)
-- **pnpm** (`npm install -g pnpm` si no lo tienes)
+- **Node.js 24** (fijado en `package.json` → `engines`)
+- **pnpm 10** (la versión exacta está en `package.json` → `packageManager`, con `corepack enable` se usa sola)
 
 ## Primeros pasos
 
