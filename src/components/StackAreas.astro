@@ -1,0 +1,109 @@
+---
+// Sección "Lo que hago" del inicio: lo más destacado por área, con cuántos
+// proyectos lo usan (calculado desde projects.ts). La lista completa de
+// herramientas vive en Sobre mí.
+import { projects, type Project } from '../data/projects';
+import { useTranslatedPath } from '../i18n/utils';
+
+interface Props {
+	lang: 'es' | 'en';
+}
+
+const { lang } = Astro.props;
+const projectsPath = useTranslatedPath(lang)('/projects/');
+
+const devicon = (name: string) => `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${name}/${name}-original.svg`;
+
+const uses = (p: Project, ...techs: string[]) => techs.some((t) => p.technologies.includes(t));
+const count = (match: (p: Project) => boolean) => projects.filter(match).length;
+
+const counts = {
+	frontend: count((p) => uses(p, 'angular')),
+	// Java fuera de Android = backend (en Android es el lenguaje de la app)
+	backend: count((p) => uses(p, 'nodejs', 'php') || (uses(p, 'java') && !uses(p, 'android'))),
+	mobile: count((p) => uses(p, 'android')),
+	data: count((p) => uses(p, 'mysql', 'postgresql', 'sqlite')),
+};
+
+const texts = {
+	es: {
+		title: 'Lo que hago',
+		subtitle: 'Las áreas en las que más he trabajado.',
+		inProjects: (n: number) => (n === 1 ? 'En 1 proyecto' : `En ${n} proyectos`),
+		frontend: { area: 'Frontend', title: 'Interfaces web', text: 'Aplicaciones en Angular con TypeScript, pensadas para que sean cómodas de usar.' },
+		backend: { area: 'Backend', title: 'APIs y servidor', text: 'La lógica detrás de la app, con Java y Spring Boot o con Node.js.' },
+		mobile: { area: 'Móvil', title: 'Apps Android', text: 'Aplicaciones nativas escritas en Java.' },
+		data: { area: 'Datos', title: 'Bases de datos', text: 'Modelado y consultas en SQL.' },
+		design: { area: 'Diseño', title: 'Diseño de interfaces', text: 'Me importa que lo que construyo no solo funcione, sino que también se vea y se sienta bien. Suelo prototipar en Figma antes de escribir código.' },
+	},
+	en: {
+		title: 'What I do',
+		subtitle: "The areas I've worked on the most.",
+		inProjects: (n: number) => (n === 1 ? 'In 1 project' : `In ${n} projects`),
+		frontend: { area: 'Frontend', title: 'Web interfaces', text: 'Angular apps written in TypeScript, built to be comfortable to use.' },
+		backend: { area: 'Backend', title: 'APIs & server', text: 'The logic behind the app, with Java and Spring Boot or with Node.js.' },
+		mobile: { area: 'Mobile', title: 'Android apps', text: 'Native apps written in Java.' },
+		data: { area: 'Data', title: 'Databases', text: 'Data modeling and SQL queries.' },
+		design: { area: 'Design', title: 'Interface design', text: 'I care about what I build not just working, but also looking and feeling right. I usually prototype in Figma before writing code.' },
+	},
+}[lang];
+
+const cards = [
+	{ key: 'frontend', wide: true, logos: [['angular', 'Angular'], ['typescript', 'TypeScript'], ['tailwindcss', 'Tailwind CSS']] },
+	{ key: 'backend', wide: true, logos: [['java', 'Java'], ['spring', 'Spring Boot'], ['nodejs', 'Node.js']] },
+	{ key: 'mobile', wide: false, logos: [['android', 'Android']] },
+	{ key: 'data', wide: false, logos: [['mysql', 'MySQL'], ['postgresql', 'PostgreSQL']] },
+] as const;
+---
+
+<section class="bg-surface-container-low py-24 px-8 md:px-16">
+	<div class="max-w-6xl mx-auto">
+		<div class="mb-16">
+			<h2 class="font-headline text-3xl font-bold tracking-tight mb-2 uppercase">{texts.title}</h2>
+			<p class="text-on-surface-muted font-body">{texts.subtitle}</p>
+		</div>
+
+		<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+			{cards.map((card, i) => {
+				const t = texts[card.key];
+				return (
+					<a
+						href={projectsPath}
+						class:list={['group bg-surface-container p-8 rounded-xl hover:bg-surface-container-high transition-colors flex flex-col justify-between gap-10', card.wide && 'md:col-span-2']}
+					>
+						<div class="flex justify-between items-start gap-4">
+							<div class="flex items-center gap-3">
+								{card.logos.map(([icon, name]) => (
+									<img src={devicon(icon)} alt={name} title={name} loading="lazy" class="w-8 h-8" />
+								))}
+							</div>
+							<span class="text-[10px] font-headline font-bold text-on-surface-muted tracking-widest uppercase whitespace-nowrap">0{i + 1} / {t.area}</span>
+						</div>
+						<div>
+							<h3 class:list={['font-headline font-bold mb-2', card.wide ? 'text-2xl' : 'text-xl']}>{t.title}</h3>
+							<p class:list={['text-on-surface-variant leading-relaxed', card.wide ? 'text-sm' : 'text-xs']}>{t.text}</p>
+							<span class="mt-6 inline-flex items-center gap-1.5 font-headline text-[10px] uppercase tracking-widest font-bold text-primary-container">
+								{texts.inProjects(counts[card.key])}
+								<span class="material-symbols-outlined text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
+							</span>
+						</div>
+					</a>
+				);
+			})}
+
+			<!-- Diseño: tarjeta de acento -->
+			<div class="md:col-span-2 bg-primary-container p-8 rounded-xl flex flex-col justify-between gap-10 text-on-primary-container">
+				<div class="flex justify-between items-start gap-4">
+					<span class="w-10 h-10 rounded-lg bg-white/90 flex items-center justify-center">
+						<img src={devicon('figma')} alt="Figma" title="Figma" loading="lazy" class="w-6 h-6" />
+					</span>
+					<span class="text-[10px] font-headline font-bold opacity-80 tracking-widest uppercase">05 / {texts.design.area}</span>
+				</div>
+				<div>
+					<h3 class="font-headline text-2xl font-bold mb-2">{texts.design.title}</h3>
+					<p class="opacity-90 text-sm leading-relaxed">{texts.design.text}</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
